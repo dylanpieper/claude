@@ -48,7 +48,7 @@
 - Do not use partial argument matching.
 - Use four dashes for section headings: `# Load data ----`.
 - Do not use `return()` at the end of a function. Use `return()` only for an early exit.
-- For complex projects, these R packages can help: devtools, usethis, renv, config, here, pins, box, targets, testthat, logger, and profvis.
+- For complex projects, these R packages can help: usethis, renv, config, here, pins, box, targets, testthat, logger, and profvis.
 - `box::use()` keeps a module in cache until the R session stops. After you change a file in the modules directory (for example, `R/`), restart R or call `box::reload()`. Then do the tests.
 
 ### Tidyverse
@@ -74,6 +74,7 @@
 
 ## R package development
 
+- Use `usethis` and `devtools` to setup and execute your workflows
 - Use `pkg::fn()` for external dependencies.
 - Use `@importFrom` for operators (for example, `%||%`), for functions that you call often, and in tight loops.
 - Use `@import` only when necessary.
@@ -83,6 +84,10 @@
 - Do not throw an error again inside `tryCatch()`. This removes the backtrace.
 - Use `rlang::check_installed()` for suggested dependencies.
 - Use `devtools::check()` for full tests and validation.
+
+## Python style
+
+I have more experience with R, so I do not have strong Python style preferences. Please find the parallels to my R preferences and use modern pythonic patterns. Consider norms and new developments within the broader functional programming landscape.
 
 ## Research writing
 
