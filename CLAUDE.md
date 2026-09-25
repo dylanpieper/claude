@@ -22,6 +22,16 @@
 - Do not use inline code (`python3 -c`, `Rscript -e`).
 - Do not make paths from shell variables.
 
+## Git workflow
+
+- Do not commit directly to main. 
+- Before any change, create a branch: `git switch -c <short-descriptive-name>`.
+- Use plain branches in the current checkout, not git worktrees.
+- Commit in small, logical steps with clear messages.
+- When the work is done, open a PR with `gh pr create`. 
+- Write a description with what changed and why, in plain language.
+- Never merge PRs. I review and merge.
+
 ## Modern data stack
 
 - Design for a modern data stack.
