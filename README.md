@@ -27,8 +27,6 @@ My rules override the installed tools when they conflict.
 - **[rules/r.md](rules/r.md)**: R preferences that the R plugins miss or contradict. Loads only for R files.
 - **[rules/roborev.md](rules/roborev.md)**: how Claude uses roborev when I ask in plain words for a review or fix.
 - **[research-writing](skills/research-writing/SKILL.md)**: APA 7, open-science, and figure rules.
-- **[block_main_commit.py](hooks/block_main_commit.py)**: blocks `git commit` on `main`. Asks when it cannot tell the branch.
-- **[tests/](tests/)**: hook tests. Run `uv run --no-project --with pytest pytest tests`. Add `CLAUDE_E2E=1` to also test Claude Code calling the hook.
 
 ## Installed tools
 
@@ -44,44 +42,67 @@ My rules override the installed tools when they conflict.
 
 ## Requirements
 
-- [Claude Code](https://claude.com/claude-code), git, and the [GitHub CLI](https://cli.github.com)
-- `python3` for the hook. R or Python with [uv](https://docs.astral.sh/uv/) for language work.
+- [Claude Code](https://claude.com/claude-code). Each install step names the other tools it needs. Install only the steps you want.
 
 ## Install
 
 ### 1. This repo
 
+Needs curl.
+
 ```
 base=https://raw.githubusercontent.com/dylanpieper/agentsflow/main
-mkdir -p ~/.claude/rules ~/.claude/skills/research-writing ~/.claude/hooks
+mkdir -p ~/.claude/rules ~/.claude/skills/research-writing
 curl -fsSL $base/CLAUDE.md -o ~/.claude/CLAUDE.md
 curl -fsSL $base/rules/r.md -o ~/.claude/rules/r.md
 curl -fsSL $base/rules/roborev.md -o ~/.claude/rules/roborev.md
 curl -fsSL $base/skills/research-writing/SKILL.md -o ~/.claude/skills/research-writing/SKILL.md
-curl -fsSL $base/hooks/block_main_commit.py -o ~/.claude/hooks/block_main_commit.py
 ```
 
-Add the hook and the merge block to `~/.claude/settings.json`. Merge them into the file, because roborev also writes hooks there:
+Add the merge block to `~/.claude/settings.json`. Merge it into the file, because roborev also writes there:
 
 ```
 {
   "permissions": {
     "deny": ["Bash(gh pr merge:*)"]
-  },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          { "type": "command", "command": "python3 ~/.claude/hooks/block_main_commit.py", "timeout": 10 }
-        ]
-      }
-    ]
   }
 }
 ```
 
-### 2. Clanker Constitution
+An earlier version of this setup added a `block_main_commit.py` hook. If your `settings.json` has it, remove that `PreToolUse` entry first. Then delete `~/.claude/hooks/block_main_commit.py`. If you delete the file first, the entry blocks every Bash command.
+
+### 2. Protect main
+
+Needs the [GitHub CLI](https://cli.github.com). Run this in each repository to block direct pushes to the default branch. Changes then go through a pull request. The ruleset does not block local commits. On the free plan, GitHub does not enforce rulesets on private repositories.
+
+```
+gh api repos/{owner}/{repo}/rulesets --method POST --input - <<'EOF'
+{
+  "name": "protect-main",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": { "ref_name": { "include": ["~DEFAULT_BRANCH"], "exclude": [] } },
+  "rules": [
+    { "type": "deletion" },
+    { "type": "non_fast_forward" },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 0,
+        "dismiss_stale_reviews_on_push": false,
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": false
+      }
+    }
+  ]
+}
+EOF
+```
+
+### 3. Clanker Constitution
+
+Needs git.
 
 ```
 git clone https://github.com/kenn-io/constitution ~/src/constitution
@@ -89,7 +110,7 @@ mkdir -p ~/.claude/rules
 ln -s ~/src/constitution/CONSTITUTION.md ~/.claude/rules/clanker-constitution.md
 ```
 
-### 3. Plugins
+### 4. Plugins
 
 ```
 claude plugin marketplace add JuliusBrussee/caveman
@@ -110,13 +131,17 @@ claude plugin marketplace add anthropics/claude-plugins-official
 claude plugin install superpowers@claude-plugins-official
 ```
 
-### 4. data-dict
+### 5. data-dict
+
+Needs [uv](https://docs.astral.sh/uv/). For other install methods, see the [data-dict install page](https://data-dict.tidyverse.org/install.html).
 
 ```
 uv tool install data-dict-yaml
 ```
 
-### 5. roborev
+### 6. roborev
+
+Needs [Homebrew](https://brew.sh).
 
 ```
 brew install kenn-io/tap/roborev
