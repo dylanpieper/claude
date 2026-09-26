@@ -40,7 +40,7 @@
 - Do not make a design more complex than necessary.
 - For large tasks with high compute, memory, or storage requirements, use DuckDB, Arrow, and/or Parquet. Use the duckdb-skills plugin.
 - For small tasks that need better data management, use SQLite.
-- When reading multiple CSV or Excel files, use read from a list and check schemas to assign a variable. Do not rely on an exact filename. 
+- When you read multiple CSV or Excel files, read them from a list and check their schemas before you assign them to variables. Do not rely on an exact filename.
 - Defensively write to accommodate updated data files or connections and handle schema changes over time. Warn of changes loudly.
 
 ## Languages and writing
