@@ -57,11 +57,7 @@ curl -fsSL $base/skills/research-writing/SKILL.md -o ~/.claude/skills/research-w
 Add this rule to `permissions.deny` in `~/.claude/settings.json`:
 
 ```
-{
-  "permissions": {
-    "deny": ["Bash(gh pr merge:*)"]
-  }
-}
+"Bash(gh pr merge:*)"
 ```
 
 ### 2. Protect main
