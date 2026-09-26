@@ -14,26 +14,51 @@ import subprocess
 import sys
 
 PROTECTED = {"main", "master"}
-OPERATORS = {";", "&&", "||", "|", "&", "\n", "(", ")", "{", "}"}
+SEPARATORS = set(";&|\n{}")
 PREFIXES = {"!", "if", "then", "else", "elif", "while", "until", "do", "time", "command", "nohup", "exec", "sudo", "xargs", "env"}
 LOOKS_LIKE_COMMIT = re.compile(r"\bgit\b.*\bcommit\b", re.DOTALL)
+UNRESOLVED = "?"
 VALUE_OPTIONS = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path", "--config-env"}
 
 
-def segments(command: str) -> list[list[str]]:
-    """Split a shell command into simple commands at operators, braces, parentheses, and unquoted newlines."""
+def segments(command: str) -> list[list[str] | str]:
+    """Split a shell command into simple commands.
+
+    Separators are `;`, `&`, `|`, braces, and unquoted newlines. Subshell parentheses
+    are kept as "(" and ")" markers so the caller can scope `cd`. Comments are dropped.
+    """
     lexer = shlex.shlex(command, posix=True, punctuation_chars="();<>|&{}\n")
     lexer.whitespace = " \t\r"
     lexer.whitespace_split = True
-    out, current = [], []
-    for tok in lexer:
-        if tok in OPERATORS or set(tok) <= set(";&|\n"):
+    lexer.commenters = ""
+    out: list[list[str] | str] = []
+    current: list[str] = []
+    in_comment = False
+
+    def flush() -> None:
+        nonlocal current
+        if current:
             out.append(current)
-            current = []
-        else:
-            current.append(tok)
-    out.append(current)
-    return [seg for seg in out if seg]
+        current = []
+
+    for tok in lexer:
+        if in_comment:
+            if "\n" in tok:
+                in_comment = False
+                flush()
+            continue
+        if tok.startswith("#"):
+            in_comment = True
+            continue
+        if set(tok) <= SEPARATORS | {"(", ")"}:
+            for ch in tok:
+                flush()
+                if ch in "()":
+                    out.append(ch)
+            continue
+        current.append(tok)
+    flush()
+    return out
 
 
 def resolve(base: str, path: str) -> str:
@@ -80,23 +105,42 @@ def git_call(seg: list[str]) -> tuple[dict[str, str], list[str], str] | None:
     return (env, opts, seg[j]) if j < len(seg) else None
 
 
+def has_git_commit(seg: list[str]) -> bool:
+    """True when `seg` has a git token followed later by `commit`."""
+    for i, tok in enumerate(seg):
+        if os.path.basename(tok) == "git" and "commit" in seg[i + 1:]:
+            return True
+    return False
+
+
 def commit_targets(command: str, cwd: str) -> list[tuple[str, dict[str, str], list[str]]]:
     """Return (working directory, env assignments, git global options) for each `git commit` in `command`.
 
-    Follows `cd`. When a `cd` target is unknown (for example `cd -`), checks the starting directory.
+    Follows `cd`, scoped to subshells. A working directory of UNRESOLVED means the hook
+    cannot tell where a commit runs, for example after `cd -` or a segment it cannot parse.
     """
     try:
-        segs = segments(command)
+        items = segments(command)
     except ValueError:
-        return []
-    start, current, targets = cwd, cwd, []
-    for seg in segs:
-        is_cd, current = cd_target(seg, current)
+        return [(UNRESOLVED, {}, [])] if LOOKS_LIKE_COMMIT.search(command) else []
+    current: str | None = cwd
+    stack: list[str | None] = []
+    targets = []
+    for item in items:
+        if item == "(":
+            stack.append(current)
+            continue
+        if item == ")":
+            current = stack.pop() if stack else current
+            continue
+        is_cd, current = cd_target(item, current)
         if is_cd:
             continue
-        call = git_call(seg)
+        call = git_call(item)
         if call and call[2] == "commit":
-            targets.append((current or start, call[0], call[1]))
+            targets.append((current or UNRESOLVED, call[0], call[1]))
+        elif not call and has_git_commit(item):
+            targets.append((UNRESOLVED, {}, []))
     return targets
 
 
@@ -113,22 +157,15 @@ def branch(cwd: str, env: dict[str, str], opts: list[str]) -> str | None:
 
 
 def decide(command: str, cwd: str) -> tuple[str, str] | None:
-    """Return (decision, reason) for `command`, or None to allow."""
-    targets = commit_targets(command, cwd)
-    if not targets:
-        if LOOKS_LIKE_COMMIT.search(command):
-            return "ask", "The command looks like a git commit, but the hook could not parse it. Check the branch before you allow it."
-        return None
-    unknown = None
-    for target_cwd, env, opts in targets:
-        current = branch(target_cwd, env, opts)
+    """Return (decision, reason) for `command`, or None to allow. Deny wins over ask."""
+    unsure = None
+    for target_cwd, env, opts in commit_targets(command, cwd):
+        current = None if target_cwd == UNRESOLVED else branch(target_cwd, env, opts)
         if current in PROTECTED:
             return "deny", f"Commit on '{current}' is blocked. Create a branch first: git switch -c <short-name>."
         if current is None:
-            unknown = target_cwd
-    if unknown:
-        return "ask", f"The hook could not read the branch for a commit in {unknown}. Check the branch before you allow it."
-    return None
+            unsure = "The hook could not tell which branch a git commit in this command targets. Check the branch before you allow it."
+    return ("ask", unsure) if unsure else None
 
 
 def respond(decision: str, reason: str) -> None:
