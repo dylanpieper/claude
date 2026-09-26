@@ -24,3 +24,10 @@ The r-skills plugin covers general style, tidyverse, rlang, and package developm
 - Use `rlang::check_installed()` for suggested dependencies.
 - Use `@importFrom` only for operators (for example, `%||%`), frequent calls, and tight loops. Use `@import` only when necessary.
 - Use `pkgdown` with `light-switch` set to `true`.
+
+## Figures and tables
+
+- For distributions in a small sample, show each point with `ggbeeswarm` or `ggforce` (sina plots).
+- For distributions in a large sample, show the shape with `ggdist` (raincloud plots and intervals) or `ggridges`. Add the data points when they stay readable.
+- For model coefficients, Likert data, and proportions, use `ggstats`.
+- For tables, use `gt`.
