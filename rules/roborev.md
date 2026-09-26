@@ -7,6 +7,6 @@ roborev reviews each commit in the background. The agent hook brings failing rev
 - When I ask in plain words to review or fix a branch or pull request, use roborev, not another review tool:
   - Review: `roborev review --branch --wait`.
   - Read findings: `roborev show --job <id> --json`.
-  - Prove each finding before you edit. Record what you fixed or disproved with `roborev comment --job <id>`, then run `roborev close <id>`.
+  - Prove each finding before you edit. Record what you fixed or disproved with `roborev comment --job <id> -m "<what you fixed or disproved>"`, then run `roborev close <id>`.
   - Do not close a review while a valid finding is still open.
 - The roborev skills (`/roborev-fix`, `/roborev-refine`, and others) run only when I type them. Before a pull request, suggest `/roborev-refine`.
