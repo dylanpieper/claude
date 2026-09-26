@@ -38,7 +38,7 @@ My rules override the installed tools when they conflict.
 - **[r-skills](https://github.com/ab604/claude-code-r-skills)** and **[Posit skills](https://github.com/posit-dev/skills)**: R, packages, Quarto, and Shiny.
 - **[python-skills](https://github.com/wdm0006/python-skills)**: Python setup with uv, ruff, and pytest.
 - **[duckdb-skills](https://github.com/duckdb/duckdb-skills)**: read and query data files.
-- **Interface skills**: [UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) for design guidance, [minimal-design-system](https://github.com/holger1411/minimal-design-system-skill) for a clean token-based look, and [accessibility-skills](https://github.com/mgifford/accessibility-skills) for WCAG checks on charts, color, tables, forms, keyboard, plain language, and themes.
+- **Interface skills**: [UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) for design guidance, [minimal-design-system](https://github.com/holger1411/minimal-design-system-skill) for a clean look built from shared color and spacing variables, and [accessibility-skills](https://github.com/mgifford/accessibility-skills) for WCAG accessibility.
 
 ## Requirements
 
@@ -109,13 +109,16 @@ claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill
 ### 4. Skill folders
 
 ```
-git clone https://github.com/holger1411/minimal-design-system-skill ~/src/minimal-design-system-skill
-ln -s ~/src/minimal-design-system-skill/minimal-design-system ~/.claude/skills/minimal-design-system
-git clone https://github.com/mgifford/accessibility-skills ~/src/accessibility-skills
-for s in charts-graphs color-contrast tables forms keyboard plain-language light-dark-mode; do
-  ln -s ~/src/accessibility-skills/skills/$s ~/.claude/skills/a11y-$s
+cd ~/src
+[ -d minimal-design-system-skill ] || git clone https://github.com/holger1411/minimal-design-system-skill
+[ -d accessibility-skills ] || git clone https://github.com/mgifford/accessibility-skills
+ln -sfn ~/src/minimal-design-system-skill/minimal-design-system ~/.claude/skills/minimal-design-system
+for d in ~/src/accessibility-skills/skills/*/; do
+  [ -f "$d/SKILL.md" ] && ln -sfn "${d%/}" ~/.claude/skills/a11y-$(basename "$d")
 done
 ```
+
+These skills load into every session. Read the upstream diff before each `git pull`.
 
 ### 5. roborev
 
