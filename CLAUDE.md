@@ -10,6 +10,7 @@
 - Do not use one example as the source of truth. Find, list, and test all applicable examples. Then examine your assumptions again.
 - In code comments and project documents, describe the result. Do not repeat information that the code shows clearly.
 - Keep code blocks in documents bare. Do not put explanatory text around them.
+- Keep change logs and release versioning for ongoing work that is being published (not a prototype).
 - Write in ASD-STE100 Simplified Technical English.
 
 ## Shell conventions
@@ -24,6 +25,7 @@
 
 ## Git workflow
 
+- I review commits before you run `git commit`.
 - Do not commit directly to main. 
 - Before any change, create a branch: `git switch -c <short-descriptive-name>`.
 - Use plain branches in the current checkout, not git worktrees.
@@ -84,6 +86,8 @@
 - Do not throw an error again inside `tryCatch()`. This removes the backtrace.
 - Use `rlang::check_installed()` for suggested dependencies.
 - Use `devtools::check()` for full tests and validation.
+- Update `NEWS.md` when noteworthy changes are made that affect users
+- Use `pkgdown` with `light-switch` set to `true`
 
 ## Python style
 
