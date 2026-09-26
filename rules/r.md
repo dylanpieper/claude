@@ -28,6 +28,6 @@ The r-skills plugin covers general style, tidyverse, rlang, and package developm
 ## Figures and tables
 
 - For distributions in a small sample, show each point with `ggbeeswarm` or `ggforce` (sina plots).
-- For distributions in a large sample, show the shape with `ggdist` (raincloud plots and intervals) or `ggridges`.
+- For distributions in a large sample, show the shape with `ggdist` (raincloud plots and intervals) or `ggridges`. Add the data points when they stay readable.
 - For model coefficients, Likert data, and proportions, use `ggstats`.
 - For tables, use `gt`.
