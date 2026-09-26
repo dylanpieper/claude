@@ -1,6 +1,6 @@
 # General instructions
 
-- Design systems that are minimal, modular, and reusable.
+- Design modern systems that are minimal, modular, and reusable.
 - Divide work into meaningful units: modules, functions, pipeline steps, or tasks.
 - Give each unit an explicit contract: inputs, outputs, and errors.
 - Make units small, but do not divide a unit that does one clear task.
