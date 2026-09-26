@@ -6,6 +6,8 @@
 - Make units small, but do not divide a unit that does one clear task.
 - Put validation and error handling in the small units.
 - Make high-level functions thin wrappers that only combine small units.
+- Apply the rule of three: do not extract a shared abstraction until the same pattern occurs three times.
+- Design for working memory: people hold about five, plus or minus two, items at once. Keep each diagram, list, table, menu, and function signature to seven items or fewer. Group larger sets into chunks.
 - Use real data at runtime when it is available. Do not hardcode data or fixes.
 - Do not use one example as the source of truth. Find, list, and test all applicable examples. Then examine your assumptions again.
 - In code comments and project documents, describe the result. Do not repeat information that the code shows clearly.
