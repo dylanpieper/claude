@@ -38,7 +38,9 @@ My rules override the installed tools when they conflict.
 - **[r-skills](https://github.com/ab604/claude-code-r-skills)** and **[Posit skills](https://github.com/posit-dev/skills)**: R, packages, Quarto, and Shiny.
 - **[python-skills](https://github.com/wdm0006/python-skills)**: Python setup with uv, ruff, and pytest.
 - **[duckdb-skills](https://github.com/duckdb/duckdb-skills)**: read and query data files.
-- **Interface skills**: [UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) for design guidance, [minimal-design-system](https://github.com/holger1411/minimal-design-system-skill) for a clean look built from shared color and spacing variables, and [accessibility-skills](https://github.com/mgifford/accessibility-skills) for WCAG accessibility.
+- **[data-dict](https://github.com/tidyverse/data-dict)**: data dictionaries that are checked against the data.
+- **[UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)**: interface design guidance.
+- **[Superpowers](https://github.com/obra/superpowers)**: workflow skills for planning, test-driven development, and debugging.
 
 ## Requirements
 
@@ -104,18 +106,14 @@ claude plugin marketplace add duckdb/duckdb-skills
 claude plugin install duckdb-skills@duckdb-skills
 claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill
 claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill
+claude plugin marketplace add anthropics/claude-plugins-official
+claude plugin install superpowers@claude-plugins-official
 ```
 
-### 4. Skill folders
+### 4. data-dict
 
 ```
-cd ~/src
-[ -d minimal-design-system-skill ] || git clone https://github.com/holger1411/minimal-design-system-skill
-[ -d accessibility-skills ] || git clone https://github.com/mgifford/accessibility-skills
-ln -sfn ~/src/minimal-design-system-skill/minimal-design-system ~/.claude/skills/minimal-design-system
-for d in ~/src/accessibility-skills/skills/*/; do
-  [ -f "$d/SKILL.md" ] && ln -sfn "${d%/}" ~/.claude/skills/a11y-$(basename "$d")
-done
+uv tool install data-dict-yaml
 ```
 
 ### 5. roborev
