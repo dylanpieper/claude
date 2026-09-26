@@ -26,7 +26,7 @@ My rules override the installed tools when they conflict.
 - **[CLAUDE.md](CLAUDE.md)**: rules for every session: design, the shell, git, and the data stack.
 - **[rules/r.md](rules/r.md)**: R preferences that the R plugins miss or contradict. Loads only for R files.
 - **[rules/roborev.md](rules/roborev.md)**: how Claude uses roborev when I ask in plain words for a review or fix.
-- **[research-writing](skills/research-writing/SKILL.md)**: APA 7 and open-science rules.
+- **[research-writing](skills/research-writing/SKILL.md)**: APA 7, open-science, and figure rules.
 - **[block_main_commit.py](hooks/block_main_commit.py)**: blocks `git commit` on `main`. Asks when it cannot tell the branch.
 - **[tests/](tests/)**: hook tests. Run `uv run --no-project --with pytest pytest tests`. Add `CLAUDE_E2E=1` to also test Claude Code calling the hook.
 
