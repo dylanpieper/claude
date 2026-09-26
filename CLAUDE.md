@@ -11,7 +11,7 @@
 ## Cognitive load
 
 - Design for working memory. Aim for about five items in each diagram, list, table, menu, or function signature, and do not go above seven. Group larger sets into chunks.
-- Use the rule of three. Group words, examples, and points in threes when the content allows it. Three items feel complete and are easy to remember.
+- Use the rule of three in sentences and examples. Group words, examples, and points in threes when the content allows it. Three items feel complete and are easy to remember.
 
 ## Writing
 
