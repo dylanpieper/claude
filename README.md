@@ -105,6 +105,7 @@ claude plugin marketplace add duckdb/duckdb-skills
 claude plugin install duckdb-skills@duckdb-skills
 claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill
 claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill
+claude plugin marketplace add anthropics/claude-plugins-official
 claude plugin install superpowers@claude-plugins-official
 ```
 
