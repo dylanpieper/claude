@@ -47,8 +47,11 @@
 - Use real data at runtime when it is available. Do not hardcode data or fixes.
 - Large scans: For tasks with high compute, memory, or storage requirements, use DuckDB, Arrow, and/or Parquet. Use the duckdb-skills plugin.
 - Small lookups: When you need better data management with a small binary footprint, use SQLite.
-- When you read multiple CSV or Excel files, read them from a file list and check their schemas before you assign them to variables. Do not rely on exact filenames.
-- Defensively write to accommodate updated data files or connections and handle schema changes over time. Warn loudly when things change.
+- Describe project data in a `data-dict.yaml` data dictionary. Before you read or write one, run `data-dict skill-read` or `data-dict skill-create`.
+- Use the dictionary as the data contract:
+  - When you read multiple CSV or Excel files, read them from a file list and check their schemas against the dictionary before you assign them to variables. Do not rely on exact filenames.
+  - Defensively write to accommodate updated data files or connections and handle schema changes over time. Warn loudly when the data and the dictionary do not agree.
+  - For Parquet, check with `data-dict validate-meta` and `data-dict validate-data`. For other sources, use `data-dict translate` to get the checks in R, Python, or SQL.
 
 ## Languages
 
