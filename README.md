@@ -48,6 +48,8 @@ My rules override the installed tools when they conflict.
 
 ### 1. This repo
 
+Needs curl.
+
 ```
 base=https://raw.githubusercontent.com/dylanpieper/agentsflow/main
 mkdir -p ~/.claude/rules ~/.claude/skills/research-writing
@@ -67,9 +69,11 @@ Add the merge block to `~/.claude/settings.json`. Merge it into the file, becaus
 }
 ```
 
+An earlier version of this setup added a `block_main_commit.py` hook. If your `settings.json` has it, remove that `PreToolUse` entry first. Then delete `~/.claude/hooks/block_main_commit.py`. If you delete the file first, the entry blocks every Bash command.
+
 ### 2. Protect main
 
-Needs the [GitHub CLI](https://cli.github.com). Run this in each repository to block direct pushes to the default branch. Changes then go through a pull request. On the free plan, GitHub does not enforce rulesets on private repositories.
+Needs the [GitHub CLI](https://cli.github.com). Run this in each repository to block direct pushes to the default branch. Changes then go through a pull request. The ruleset does not block local commits. On the free plan, GitHub does not enforce rulesets on private repositories.
 
 ```
 gh api repos/{owner}/{repo}/rulesets --method POST --input - <<'EOF'
@@ -136,6 +140,8 @@ uv tool install data-dict-yaml
 ```
 
 ### 6. roborev
+
+Needs [Homebrew](https://brew.sh).
 
 ```
 brew install kenn-io/tap/roborev
