@@ -118,8 +118,6 @@ for d in ~/src/accessibility-skills/skills/*/; do
 done
 ```
 
-Claude lists each skill's description in every session and loads the full skill only when a task matches. Read the upstream diff before each `git pull`.
-
 ### 5. roborev
 
 ```
