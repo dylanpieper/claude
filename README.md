@@ -40,7 +40,8 @@ My rules override the installed tools when they conflict.
 - **[CLAUDE.md](CLAUDE.md)**: rules for every session: design, the shell, git, and the data stack.
 - **[rules/r.md](rules/r.md)**: my R preferences that the R plugins miss or contradict. It loads only when Claude reads an R file.
 - **[research-writing](skills/research-writing/SKILL.md)**: a skill with APA 7 and open-science rules for manuscripts, reports, and statistical results.
-- **[block_main_commit.py](hooks/block_main_commit.py)**: a hook that blocks `git commit` on `main`.
+- **[block_main_commit.py](hooks/block_main_commit.py)**: a hook that blocks `git commit` on `main`. When it cannot tell which branch a commit targets, it asks instead of allowing.
+- **[tests/](tests/)**: hook tests against real temporary repositories, and an end-to-end test that runs Claude Code with the hook. Run them with `uv run --no-project --with pytest pytest tests`. Add `CLAUDE_E2E=1` to include the end-to-end test, which calls the model.
 
 ## Installed tools
 
