@@ -15,7 +15,7 @@ The r-skills plugin covers general style, tidyverse, rlang, and package developm
 - A function with side effects returns its first argument invisibly.
 - For data that is not clean, use `janitor::clean_names()`.
 - In scripts, call functions from loaded packages directly. Use `pkg::fn()` only for one or two calls, for a name conflict, or in package code.
-- For complex projects, these packages can help: renv, config, here, pins, box, targets, logger, and profvis.
+- For complex projects, these packages can help: `renv`, `config`, `here`, `pins`, `box`, `targets`, `logger`, and `profvis`.
 - `box::use()` keeps a module in cache until the R session stops. After you change a module file, restart R or call `box::reload()`. Then do the tests.
 
 ## Packages
