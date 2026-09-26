@@ -27,7 +27,7 @@
 
 - I review commits before you run `git commit`.
 - Do not commit directly to main.
-- Before any change, create a branch: `git switch -c <short-descriptive-name>`.
+- Before any change, create a branch: `git switch -c <short-name>`.
 - Use plain branches in the current checkout, not git worktrees.
 - Commit in small, logical steps with clear messages.
 - When the work is done, open a PR with `gh pr create`.
@@ -36,9 +36,12 @@
 
 ## Data stack
 
+- Recommend a modern data stack within your skills and general knowledge. Present alternatives but rank by best fit.
 - Do not make a design more complex than necessary.
-- For large tasks with high compute, memory, or storage requirements, use DuckDB, Arrow, and Parquet. Use the duckdb-skills plugin to read and query data files.
+- For large tasks with high compute, memory, or storage requirements, use DuckDB, Arrow, and/or Parquet. Use the duckdb-skills plugin.
 - For small tasks that need better data management, use SQLite.
+- When reading multiple CSV or Excel files, use read from a list and check schemas to assign a variable. Do not rely on an exact filename. 
+- Defensively write to accommodate updated data files or connections and handle schema changes over time. Warn of changes loudly.
 
 ## Languages and writing
 
