@@ -32,5 +32,5 @@ description: APA 7, open-science, and figure rules for research writing. Use whe
 
 - Show the raw data when you can. Put the summary on top of the data points. Do not show a summary alone.
 - Do not use a bar chart with error bars for continuous data.
-- Select the form by sample size. For a small sample, show each data point. For a large sample, show the shape of the distribution.
+- Select the form by sample size. For a small sample, show each data point. For a large sample, show the shape of the distribution and add the data points when they stay readable.
 - Give the sample size for each group.
