@@ -38,7 +38,7 @@ My rules override the installed tools when they conflict.
 - **[r-skills](https://github.com/ab604/claude-code-r-skills)** and **[Posit skills](https://github.com/posit-dev/skills)**: R, packages, Quarto, and Shiny.
 - **[python-skills](https://github.com/wdm0006/python-skills)**: Python setup with uv, ruff, and pytest.
 - **[duckdb-skills](https://github.com/duckdb/duckdb-skills)**: read and query data files.
-- **[UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)**: interface design.
+- **Interface skills**: [UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) for design guidance, [minimal-design-system](https://github.com/holger1411/minimal-design-system-skill) for a clean token-based look, and [accessibility-skills](https://github.com/mgifford/accessibility-skills) for WCAG checks on charts, color, tables, forms, keyboard, plain language, and themes.
 
 ## Requirements
 
@@ -59,7 +59,7 @@ curl -fsSL $base/skills/research-writing/SKILL.md -o ~/.claude/skills/research-w
 curl -fsSL $base/hooks/block_main_commit.py -o ~/.claude/hooks/block_main_commit.py
 ```
 
-Add the hook and the merge block to `~/.claude/settings.json`:
+Add the hook and the merge block to `~/.claude/settings.json`. Merge them into the file, because roborev also writes hooks there:
 
 ```
 {
@@ -83,6 +83,7 @@ Add the hook and the merge block to `~/.claude/settings.json`:
 
 ```
 git clone https://github.com/kenn-io/constitution ~/src/constitution
+mkdir -p ~/.claude/rules
 ln -s ~/src/constitution/CONSTITUTION.md ~/.claude/rules/clanker-constitution.md
 ```
 
@@ -105,7 +106,18 @@ claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill
 claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill
 ```
 
-### 4. roborev
+### 4. Skill folders
+
+```
+git clone https://github.com/holger1411/minimal-design-system-skill ~/src/minimal-design-system-skill
+ln -s ~/src/minimal-design-system-skill/minimal-design-system ~/.claude/skills/minimal-design-system
+git clone https://github.com/mgifford/accessibility-skills ~/src/accessibility-skills
+for s in charts-graphs color-contrast tables forms keyboard plain-language light-dark-mode; do
+  ln -s ~/src/accessibility-skills/skills/$s ~/.claude/skills/a11y-$s
+done
+```
+
+### 5. roborev
 
 ```
 brew install kenn-io/tap/roborev
