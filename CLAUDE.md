@@ -1,4 +1,4 @@
-# General
+# General instructions
 
 - Design systems that are minimal, modular, and reusable.
 - Divide work into meaningful units: modules, functions, pipeline steps, or tasks.
@@ -9,7 +9,7 @@
 - Use real data at runtime when it is available. Do not hardcode data or fixes.
 - Do not use one example as the source of truth. Find, list, and test all applicable examples. Then examine your assumptions again.
 - In code comments and project documents, describe the result. Do not repeat information that the code shows clearly.
-- Keep code blocks in documents bare. Do not put explanatory text around them.
+- Keep code blocks in documents bare. Tell a story. Describe an outcome. Do not put filler explanatory text around them.
 - Keep change logs and release versioning for ongoing work that is being published (not a prototype).
 - Write in ASD-STE100 Simplified Technical English.
 
