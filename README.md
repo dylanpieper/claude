@@ -37,7 +37,7 @@ My rules override the installed tools when they conflict.
 - **[python-skills](https://github.com/wdm0006/python-skills)**: Python setup with uv, ruff, and pytest.
 - **[duckdb-skills](https://github.com/duckdb/duckdb-skills)**: read and query data files.
 - **[data-dict](https://github.com/tidyverse/data-dict)**: data dictionaries that are checked against the data.
-- **[UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)**: interface design guidance.
+- **[slidecrafting](https://github.com/EmilHvitfeldt/slidecrafting-book.com)**: build, theme, and animate Quarto reveal.js slide decks.
 - **[Superpowers](https://github.com/obra/superpowers)**: workflow skills for planning, test-driven development, and debugging.
 
 ## Requirements
@@ -68,8 +68,6 @@ Add the merge block to `~/.claude/settings.json`. Merge it into the file, becaus
   }
 }
 ```
-
-An earlier version of this setup added a `block_main_commit.py` hook. If your `settings.json` has it, remove that `PreToolUse` entry first. Then delete `~/.claude/hooks/block_main_commit.py`. If you delete the file first, the entry blocks every Bash command.
 
 ### 2. Protect main
 
@@ -125,8 +123,8 @@ claude plugin marketplace add wdm0006/python-skills
 claude plugin install python-library-foundations@dev-skills
 claude plugin marketplace add duckdb/duckdb-skills
 claude plugin install duckdb-skills@duckdb-skills
-claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill
-claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill
+claude plugin marketplace add EmilHvitfeldt/slidecrafting-book.com
+claude plugin install slidecrafting@slidecrafting
 claude plugin marketplace add anthropics/claude-plugins-official
 claude plugin install superpowers@claude-plugins-official
 ```
