@@ -14,7 +14,8 @@ import sys
 
 PROTECTED = {"main", "master"}
 SHELLS = {"sh", "bash", "zsh", "dash", "eval"}
-DENY_REASON = "Commit on '{branch}' is blocked. Create a branch first: git switch -c <short-name>."
+DENY_PREFIX = "Commit on '{branch}' is blocked"
+DENY_REASON = DENY_PREFIX + ". Create a branch first: git switch -c <short-name>."
 PREFIXES = {"!", "if", "then", "else", "elif", "while", "until", "do", "time", "command", "nohup", "exec", "sudo", "xargs", "env"}
 LOOKS_LIKE_COMMIT = re.compile(r"\bgit\b.*\bcommit\b", re.DOTALL)
 UNRESOLVED = "?"
@@ -108,6 +109,8 @@ def segments(command: str) -> list[list[str] | str]:
             current = []
         if text in ("(", ")", "|", "&"):
             out.append(text)
+        elif text == "|&":
+            out.append("|")
     if current:
         out.append(current)
     return out
@@ -160,14 +163,18 @@ def git_call(seg: list[str]) -> tuple[dict[str, str], list[str], str] | None:
 def has_git_commit(seg: list[str]) -> bool:
     """True when `seg` may run a commit that git_call cannot resolve.
 
-    Covers a git token followed later by `commit`, and a shell or eval whose
-    argument text contains a git commit, such as `sh -c "git commit"`.
+    Covers a git token followed later by `commit`, a shell or eval anywhere in the
+    segment whose argument text contains a git commit (`sudo -u me sh -c "git commit"`),
+    and a command substitution inside quotes (`echo "$(git commit)"`).
     """
     for i, tok in enumerate(seg):
         if os.path.basename(tok) == "git" and "commit" in seg[i + 1:]:
             return True
-    runner = next((t for t in seg if t not in PREFIXES and "=" not in t), "")
-    return os.path.basename(runner) in SHELLS and any(LOOKS_LIKE_COMMIT.search(t) for t in seg)
+    runs_shell = any(os.path.basename(t) in SHELLS for t in seg)
+    return any(
+        LOOKS_LIKE_COMMIT.search(t) and (runs_shell or "$(" in t or "`" in t)
+        for t in seg
+    )
 
 
 def commit_targets(command: str, cwd: str) -> list[tuple[str, dict[str, str], list[str]]]:
@@ -183,6 +190,7 @@ def commit_targets(command: str, cwd: str) -> list[tuple[str, dict[str, str], li
     current: str | None = cwd
     before_cd: str | None = cwd
     last_was_cd = False
+    after_pipe = False
     stack: list[str | None] = []
     targets = []
     for item in items:
@@ -193,18 +201,27 @@ def commit_targets(command: str, cwd: str) -> list[tuple[str, dict[str, str], li
         elif item in ("|", "&"):
             if last_was_cd:
                 current = before_cd
+            after_pipe = item == "|"
+            last_was_cd = False
+            continue
         else:
             before_cd = current
             last_was_cd, current = cd_target(item, current)
             if last_was_cd:
+                # The last element of a pipeline runs in a subshell in bash but not in zsh.
+                if after_pipe:
+                    current = None
+                after_pipe = False
                 continue
             call = git_call(item)
             if call and call[2] == "commit":
                 targets.append((current or UNRESOLVED, call[0], call[1]))
             elif not call and has_git_commit(item):
                 targets.append((UNRESOLVED, {}, []))
+            after_pipe = False
             continue
         last_was_cd = False
+        after_pipe = False
     return targets
 
 

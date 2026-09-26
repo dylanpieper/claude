@@ -15,10 +15,10 @@ import pytest
 
 HOOK = Path(__file__).resolve().parents[1] / "hooks" / "block_main_commit.py"
 sys.path.insert(0, str(HOOK.parent))
-from block_main_commit import DENY_REASON as TEMPLATE  # noqa: E402
+from block_main_commit import DENY_PREFIX  # noqa: E402
 
-# The part of the hook's deny message before the command example, as it appears in the transcript.
-DENY_REASON = TEMPLATE.format(branch="main").split(":")[0]
+# The fixed start of the hook's deny message, as it appears in the transcript.
+DENY_REASON = DENY_PREFIX.format(branch="main")
 # Keep the user's global git config (signing, hooksPath) out of the test.
 GIT_ENV = {**os.environ, "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1"}
 PROMPT = "Run this exact Bash command once and do nothing else: git commit --allow-empty -m e2e-probe"

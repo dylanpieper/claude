@@ -68,6 +68,7 @@ BLOCKED = [
     ("cd ../on_feature & git commit -m m", "on_main"),
     ("git commit -m m 2>&1", "on_main"),
     ("git commit -m m \\\n  --allow-empty", "on_main"),
+    ("cd ../on_feature |& true; git commit -m m", "on_main"),
 ]
 
 ALLOWED = [
@@ -94,6 +95,12 @@ ASKED = [
     ('sh -c "git commit -m m"', "on_main"),
     ("bash -lc 'cd ~/on_main && git commit -m m'", "on_feature"),
     ('eval "git commit -m m"', "on_main"),
+    ('env -i bash -c "git commit -m m"', "on_main"),
+    ("sudo -u me sh -c 'git commit -m m'", "on_main"),
+    ("xargs -0 sh -c 'git commit'", "on_main"),
+    ('echo "$(git commit -m m)"', "on_main"),
+    ('x="`git commit -m m`"', "on_main"),
+    ("true | cd ../on_feature; git commit -m m", "on_main"),
     ("git commit -m 'unclosed", "on_main"),
     ("git commit -m m", "."),
 ]
@@ -125,8 +132,11 @@ def test_segments_split_at_operators():
     assert hook.segments("(cd x);y # z\nw") == ["(", ["cd", "x"], ")", ["y"], ["w"]]
     assert hook.segments("a | b & c") == [["a"], "|", ["b"], "&", ["c"]]
     assert hook.segments("echo \"#(\" 'x;y'") == [["echo", "#(", "x;y"]]
-
-
-def test_deny_reason_names_branch():
-    assert hook.DENY_REASON.format(branch="main").startswith("Commit on 'main' is blocked")
     assert hook.segments('git commit -m "x\ny"') == [["git", "commit", "-m", "x\ny"]]
+
+
+def test_deny_reason_names_branch(home):
+    event = json.dumps({"cwd": str(home / "on_main"), "tool_input": {"command": "git commit -m m"}})
+    out = subprocess.run([sys.executable, str(HOOK)], input=event, capture_output=True, text=True, check=True).stdout
+    reason = json.loads(out)["hookSpecificOutput"]["permissionDecisionReason"]
+    assert reason.startswith(hook.DENY_PREFIX.format(branch="main"))
