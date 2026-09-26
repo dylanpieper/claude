@@ -11,7 +11,8 @@ The r-skills plugin covers general style, tidyverse, rlang, and package developm
 - Do not use `return()` at the end of a function, even a long one. Use `return()` only for an early exit.
 - Use four dashes for section headings: `# Load data ----`.
 - Do not use partial argument matching.
-- After you write or change R code, format it with Air: `air format <path>`. Do not use `styler`.
+- After you write or change a `.R` file, format it with Air: `air format <path>`. Air does not format code chunks in R Markdown or Quarto files.
+- Do not use `styler`. In a project that uses a different formatter, use that formatter.
 - Use `cli` for console output (for example, `cli::cli_alert_success()`). Do not use `cat()`, `message()`, or `print()`.
 - A function with side effects returns its first argument invisibly.
 - For data that is not clean, use `janitor::clean_names()`.
