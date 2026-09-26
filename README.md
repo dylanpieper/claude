@@ -69,8 +69,6 @@ Add the merge block to `~/.claude/settings.json`. Merge it into the file, becaus
 }
 ```
 
-An earlier version of this setup added a `block_main_commit.py` hook. If your `settings.json` has it, remove that `PreToolUse` entry first. Then delete `~/.claude/hooks/block_main_commit.py`. If you delete the file first, the entry blocks every Bash command.
-
 ### 2. Protect main
 
 Needs the [GitHub CLI](https://cli.github.com). Run this in each repository to block direct pushes to the default branch. Changes then go through a pull request. The ruleset does not block local commits. On the free plan, GitHub does not enforce rulesets on private repositories.
