@@ -9,55 +9,107 @@ from __future__ import annotations
 import json
 import os
 import re
-import shlex
 import subprocess
 import sys
 
 PROTECTED = {"main", "master"}
-SEPARATORS = set(";&|\n{}")
+SHELLS = {"sh", "bash", "zsh", "dash", "eval"}
+DENY_REASON = "Commit on '{branch}' is blocked. Create a branch first: git switch -c <short-name>."
 PREFIXES = {"!", "if", "then", "else", "elif", "while", "until", "do", "time", "command", "nohup", "exec", "sudo", "xargs", "env"}
 LOOKS_LIKE_COMMIT = re.compile(r"\bgit\b.*\bcommit\b", re.DOTALL)
 UNRESOLVED = "?"
 VALUE_OPTIONS = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path", "--config-env"}
 
 
-def segments(command: str) -> list[list[str] | str]:
-    """Split a shell command into simple commands.
+def lex(command: str) -> list[tuple[str, str]]:
+    """Split `command` into ("word", text) and ("op", symbol) tokens.
 
-    Separators are `;`, `&`, `|`, braces, and unquoted newlines. Subshell parentheses
-    are kept as "(" and ")" markers so the caller can scope `cd`. Comments are dropped.
+    Quote-aware: `#`, parentheses, and operators count as syntax only when unquoted.
+    Comments are dropped before their text is read. Raises ValueError on an unclosed quote.
     """
-    lexer = shlex.shlex(command, posix=True, punctuation_chars="();<>|&{}\n")
-    lexer.whitespace = " \t\r"
-    lexer.whitespace_split = True
-    lexer.commenters = ""
+    tokens: list[tuple[str, str]] = []
+    buf, in_word, i, n = [], False, 0, len(command)
+
+    def end_word() -> None:
+        nonlocal buf, in_word
+        if in_word:
+            word = "".join(buf)
+            tokens.append(("op", word) if word in ("{", "}") else ("word", word))
+        buf, in_word = [], False
+
+    while i < n:
+        ch = command[i]
+        if ch in " \t\r":
+            end_word()
+        elif ch == "\n":
+            end_word()
+            tokens.append(("op", "\n"))
+        elif ch == "#" and not in_word:
+            while i < n and command[i] != "\n":
+                i += 1
+            continue
+        elif ch == "\\":
+            if i + 1 < n and command[i + 1] != "\n":
+                buf.append(command[i + 1])
+                in_word = True
+            i += 2
+            continue
+        elif ch == "'":
+            close = command.find("'", i + 1)
+            if close < 0:
+                raise ValueError("unclosed single quote")
+            buf.append(command[i + 1:close])
+            in_word, i = True, close + 1
+            continue
+        elif ch == '"':
+            j = i + 1
+            while j < n and command[j] != '"':
+                if command[j] == "\\" and j + 1 < n:
+                    j += 1
+                buf.append(command[j])
+                j += 1
+            if j >= n:
+                raise ValueError("unclosed double quote")
+            in_word, i = True, j + 1
+            continue
+        elif ch == "&" and (command[i - 1:i] in ("<", ">") or command[i + 1:i + 2] == ">"):
+            buf.append(ch)
+            in_word = True
+        elif ch in ";&|()`":
+            end_word()
+            pair = command[i:i + 2]
+            if pair in ("&&", "||", ";;", "|&"):
+                tokens.append(("op", pair))
+                i += 2
+                continue
+            tokens.append(("op", ch))
+        else:
+            buf.append(ch)
+            in_word = True
+        i += 1
+    end_word()
+    return tokens
+
+
+def segments(command: str) -> list[list[str] | str]:
+    """Split a shell command into simple commands and scope markers.
+
+    Returns word lists for simple commands, "(" and ")" for subshells, and "|" or "&"
+    after a command that runs in its own subshell (a pipeline element or a background job).
+    """
     out: list[list[str] | str] = []
     current: list[str] = []
-    in_comment = False
-
-    def flush() -> None:
-        nonlocal current
+    for kind, text in lex(command):
+        if kind == "word":
+            current.append(text)
+            continue
         if current:
             out.append(current)
-        current = []
-
-    for tok in lexer:
-        if in_comment:
-            if "\n" in tok:
-                in_comment = False
-                flush()
-            continue
-        if tok.startswith("#"):
-            in_comment = True
-            continue
-        if set(tok) <= SEPARATORS | {"(", ")"}:
-            for ch in tok:
-                flush()
-                if ch in "()":
-                    out.append(ch)
-            continue
-        current.append(tok)
-    flush()
+            current = []
+        if text in ("(", ")", "|", "&"):
+            out.append(text)
+    if current:
+        out.append(current)
     return out
 
 
@@ -106,41 +158,53 @@ def git_call(seg: list[str]) -> tuple[dict[str, str], list[str], str] | None:
 
 
 def has_git_commit(seg: list[str]) -> bool:
-    """True when `seg` has a git token followed later by `commit`."""
+    """True when `seg` may run a commit that git_call cannot resolve.
+
+    Covers a git token followed later by `commit`, and a shell or eval whose
+    argument text contains a git commit, such as `sh -c "git commit"`.
+    """
     for i, tok in enumerate(seg):
         if os.path.basename(tok) == "git" and "commit" in seg[i + 1:]:
             return True
-    return False
+    runner = next((t for t in seg if t not in PREFIXES and "=" not in t), "")
+    return os.path.basename(runner) in SHELLS and any(LOOKS_LIKE_COMMIT.search(t) for t in seg)
 
 
 def commit_targets(command: str, cwd: str) -> list[tuple[str, dict[str, str], list[str]]]:
     """Return (working directory, env assignments, git global options) for each `git commit` in `command`.
 
-    Follows `cd`, scoped to subshells. A working directory of UNRESOLVED means the hook
-    cannot tell where a commit runs, for example after `cd -` or a segment it cannot parse.
+    Follows `cd`, scoped to subshells, pipelines, and background jobs. A working directory
+    of UNRESOLVED means the hook cannot tell where a commit runs.
     """
     try:
         items = segments(command)
     except ValueError:
         return [(UNRESOLVED, {}, [])] if LOOKS_LIKE_COMMIT.search(command) else []
     current: str | None = cwd
+    before_cd: str | None = cwd
+    last_was_cd = False
     stack: list[str | None] = []
     targets = []
     for item in items:
         if item == "(":
             stack.append(current)
-            continue
-        if item == ")":
+        elif item == ")":
             current = stack.pop() if stack else current
+        elif item in ("|", "&"):
+            if last_was_cd:
+                current = before_cd
+        else:
+            before_cd = current
+            last_was_cd, current = cd_target(item, current)
+            if last_was_cd:
+                continue
+            call = git_call(item)
+            if call and call[2] == "commit":
+                targets.append((current or UNRESOLVED, call[0], call[1]))
+            elif not call and has_git_commit(item):
+                targets.append((UNRESOLVED, {}, []))
             continue
-        is_cd, current = cd_target(item, current)
-        if is_cd:
-            continue
-        call = git_call(item)
-        if call and call[2] == "commit":
-            targets.append((current or UNRESOLVED, call[0], call[1]))
-        elif not call and has_git_commit(item):
-            targets.append((UNRESOLVED, {}, []))
+        last_was_cd = False
     return targets
 
 
@@ -162,7 +226,7 @@ def decide(command: str, cwd: str) -> tuple[str, str] | None:
     for target_cwd, env, opts in commit_targets(command, cwd):
         current = None if target_cwd == UNRESOLVED else branch(target_cwd, env, opts)
         if current in PROTECTED:
-            return "deny", f"Commit on '{current}' is blocked. Create a branch first: git switch -c <short-name>."
+            return "deny", DENY_REASON.format(branch=current)
         if current is None:
             unsure = "The hook could not tell which branch a git commit in this command targets. Check the branch before you allow it."
     return ("ask", unsure) if unsure else None

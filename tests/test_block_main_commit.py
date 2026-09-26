@@ -60,6 +60,14 @@ BLOCKED = [
     ("(cd ../on_feature);git commit -m m", "on_main"),
     ("git commit -m a && cd ../on_main # next\ngit commit -m b", "on_feature"),
     ("git add . # stage\ngit commit -m m", "on_main"),
+    ('echo "#1" && git commit -m m', "on_main"),
+    ("printf '# Title\\n' > README.md && git add . && git commit -m m", "on_main"),
+    ("echo '(' && git commit -m m", "on_main"),
+    ('(cd ../on_feature && echo "(") && git commit -m m', "on_main"),
+    ("cd ../on_feature | true; git commit -m m", "on_main"),
+    ("cd ../on_feature & git commit -m m", "on_main"),
+    ("git commit -m m 2>&1", "on_main"),
+    ("git commit -m m \\\n  --allow-empty", "on_main"),
 ]
 
 ALLOWED = [
@@ -75,12 +83,17 @@ ALLOWED = [
     ("git add .\necho commit", "on_main"),
     ("(cd ../on_main && git status) && git commit -m m", "on_feature"),
     ("git status # git commit later", "on_main"),
+    ("git add . # don't forget\ngit commit -m m", "on_feature"),
+    ("git log --format='%h {{x}}' HEAD@{{1}}", "on_main"),
     ("GIT_DIR={home}/on_feature/.git GIT_WORK_TREE={home}/on_feature git commit -m m", "on_main"),
 ]
 
 ASKED = [
     ("echo git commit", "on_main"),
     ("cd - && git commit -m m", "on_feature"),
+    ('sh -c "git commit -m m"', "on_main"),
+    ("bash -lc 'cd ~/on_main && git commit -m m'", "on_feature"),
+    ('eval "git commit -m m"', "on_main"),
     ("git commit -m 'unclosed", "on_main"),
     ("git commit -m m", "."),
 ]
@@ -108,6 +121,12 @@ def test_asks_when_hook_crashes(tmp_path):
 
 
 def test_segments_split_at_operators():
-    assert hook.segments("a b;c && d | e\nf") == [["a", "b"], ["c"], ["d"], ["e"], ["f"]]
+    assert hook.segments("a b;c && d | e\nf") == [["a", "b"], ["c"], ["d"], "|", ["e"], ["f"]]
     assert hook.segments("(cd x);y # z\nw") == ["(", ["cd", "x"], ")", ["y"], ["w"]]
+    assert hook.segments("a | b & c") == [["a"], "|", ["b"], "&", ["c"]]
+    assert hook.segments("echo \"#(\" 'x;y'") == [["echo", "#(", "x;y"]]
+
+
+def test_deny_reason_names_branch():
+    assert hook.DENY_REASON.format(branch="main").startswith("Commit on 'main' is blocked")
     assert hook.segments('git commit -m "x\ny"') == [["git", "commit", "-m", "x\ny"]]
