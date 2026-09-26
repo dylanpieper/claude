@@ -42,16 +42,19 @@
 
 ## Data stack
 
-- Recommend a modern data stack within your skills and general knowledge. Present alternatives but rank by best fit.
-- Do not make a design more complex than necessary.
+- Recommend a modern data stack from your skills and general knowledge. Show alternatives and put them in order of best fit.
 - Use real data at runtime when it is available. Do not hardcode data or fixes.
-- Large or heavy work: When a task needs much compute, memory, or storage, use DuckDB, Arrow, or Parquet. Use the duckdb-skills plugin.
-- Small persistent data: When small data needs structured storage, transactions, or many small reads and writes, use SQLite. SQLite keeps the data in one file and needs no server.
-- Describe project data in a `data-dict.yaml` data dictionary. Before you read or write one, run `data-dict skill-read` or `data-dict skill-create`.
-- Use the dictionary as the data contract:
-  - When you read multiple CSV or Excel files, read them from a file list and check their schemas against the dictionary before you assign them to variables. Do not rely on exact filenames.
-  - Defensively write to accommodate updated data files or connections and handle schema changes over time. Warn loudly when the data and the dictionary do not agree.
-  - For Parquet, check with `data-dict validate-meta` and `data-dict validate-data`. For other sources, use `data-dict translate` to get the checks in R, Python, or SQL.
+- Large or heavy work: When a task needs much processing power, memory, or storage, use DuckDB with Arrow or Parquet as necessary. DuckDB is best for large column scans and aggregations. Use the duckdb-skills plugin.
+- Small persistent data: When small data needs transactions or many small row reads and writes, use SQLite.
+
+## Data dictionaries
+
+- When a project reads data files more than one time, describe them in a `data-dict.yaml` file. Use it as the data contract.
+- Before you read a dictionary, run `data-dict skill-read`. Before you create or change one, run `data-dict skill-create`.
+- Read multiple CSV or Excel files from a file list. Do not rely on exact filenames. Before you assign data to variables, check its schema. If there is a dictionary, check against it.
+- Write code that continues to work when data files, connections, or schemas change. When the data and the dictionary do not agree, warn loudly.
+- For Parquet, use `data-dict validate-meta` and `data-dict validate-data`. For other sources, use `data-dict translate` to get the checks in R, Python, or SQL.
+- If `data-dict` is not available, tell me. Then check the schemas in code.
 
 ## Languages
 
