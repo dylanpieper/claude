@@ -37,6 +37,7 @@ My rules override the installed tools when they conflict.
 - **[python-skills](https://github.com/wdm0006/python-skills)**: Python setup with uv, ruff, and pytest.
 - **[duckdb-skills](https://github.com/duckdb/duckdb-skills)**: read and query data files.
 - **[data-dict](https://github.com/tidyverse/data-dict)**: data dictionaries that are checked against the data.
+- **[Air](https://posit-dev.github.io/air/)**: R code formatter.
 - **[slidecrafting](https://github.com/EmilHvitfeldt/slidecrafting-book.com)**: build, theme, and animate Quarto reveal.js slide decks.
 - **[Superpowers](https://github.com/obra/superpowers)**: workflow skills for planning, test-driven development, and debugging.
 
@@ -137,7 +138,15 @@ Needs [uv](https://docs.astral.sh/uv/). For other install methods, see the [data
 uv tool install data-dict-yaml
 ```
 
-### 6. roborev
+### 6. Air
+
+Needs [uv](https://docs.astral.sh/uv/). For other install methods, see the [Air install page](https://posit-dev.github.io/air/cli.html).
+
+```
+uv tool install air-formatter
+```
+
+### 7. roborev
 
 Needs [Homebrew](https://brew.sh).
 
