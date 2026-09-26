@@ -45,8 +45,8 @@
 - Recommend a modern data stack within your skills and general knowledge. Present alternatives but rank by best fit.
 - Do not make a design more complex than necessary.
 - Use real data at runtime when it is available. Do not hardcode data or fixes.
-- For large tasks with high compute, memory, or storage requirements, use DuckDB, Arrow, and/or Parquet. Use the duckdb-skills plugin.
-- For small tasks that need better data management, use SQLite.
+- Large scans: For tasks with high compute, memory, or storage requirements, use DuckDB, Arrow, and/or Parquet. Use the duckdb-skills plugin.
+- Small lookups: When you need better data management with a small binary footprint, use SQLite.
 - When you read multiple CSV or Excel files, read them from a file list and check their schemas before you assign them to variables. Do not rely on exact filenames.
 - Defensively write to accommodate updated data files or connections and handle schema changes over time. Warn loudly when things change.
 
