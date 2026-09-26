@@ -45,8 +45,8 @@
 - Recommend a modern data stack within your skills and general knowledge. Present alternatives but rank by best fit.
 - Do not make a design more complex than necessary.
 - Use real data at runtime when it is available. Do not hardcode data or fixes.
-- Large scans: For tasks with high compute, memory, or storage requirements, use DuckDB, Arrow, and/or Parquet. Use the duckdb-skills plugin.
-- Small lookups: When you need better data management with a small binary footprint, use SQLite.
+- Large or heavy work: When a task needs much compute, memory, or storage, use DuckDB, Arrow, or Parquet. Use the duckdb-skills plugin.
+- Small persistent data: When small data needs structured storage, transactions, or many small reads and writes, use SQLite. SQLite keeps the data in one file and needs no server.
 - Describe project data in a `data-dict.yaml` data dictionary. Before you read or write one, run `data-dict skill-read` or `data-dict skill-create`.
 - Use the dictionary as the data contract:
   - When you read multiple CSV or Excel files, read them from a file list and check their schemas against the dictionary before you assign them to variables. Do not rely on exact filenames.
