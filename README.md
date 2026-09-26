@@ -31,13 +31,27 @@
     merge ✦ ◄───────────────────┼─────────────────┘
 ```
 
-This repository holds my global Claude Code configuration. The workflow joins five parts:
+This repository holds my global Claude Code configuration. My own additions are small. Installed tools do the rest.
 
-- **My additions**: my unique contribution, kept small. [CLAUDE.md](CLAUDE.md) sets rules for design, the shell, git, and the data stack. [rules/r.md](rules/r.md) adds my R preferences on top of r-skills. The [research-writing](skills/research-writing/SKILL.md) skill holds APA 7 and open-science rules. A [hook](hooks/block_main_commit.py) blocks commits on `main`.
-- **Domain skills**: community plugins that Claude loads when a task needs them. [r-skills](https://github.com/ab604/claude-code-r-skills) and [Posit skills](https://github.com/posit-dev/skills) cover R, R packages, Quarto, and Shiny. [python-skills](https://github.com/wdm0006/python-skills) covers Python. [duckdb-skills](https://github.com/duckdb/duckdb-skills) reads and queries data files. [UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) guides interface design.
+## In this repo
+
+My rules override the installed tools when they conflict.
+
+- **[CLAUDE.md](CLAUDE.md)**: rules for every session: design, the shell, git, and the data stack.
+- **[rules/r.md](rules/r.md)**: my R preferences that the R plugins miss or contradict. It loads only when Claude reads an R file.
+- **[research-writing](skills/research-writing/SKILL.md)**: a skill with APA 7 and open-science rules for manuscripts, reports, and statistical results.
+- **[block_main_commit.py](hooks/block_main_commit.py)**: a hook that blocks `git commit` on `main`.
+
+## Installed tools
+
 - **[Clanker Constitution](https://github.com/kenn-io/constitution)**: default operating principles for coding agents. The agent honors the request, acts with judgment, finishes the job, protects existing work, verifies reality, and communicates for humans.
-- **[caveman](https://github.com/juliusbrussee/caveman)**: a plugin that makes Claude write short output. It keeps all technical content and uses fewer tokens.
 - **[roborev](https://github.com/kenn-io/roborev)**: continuous code review. It reviews each commit in the background, tells the agent about the findings, and shows the reviews in a terminal UI.
+- **[caveman](https://github.com/juliusbrussee/caveman)**: makes Claude write short output. It keeps all technical content and uses fewer tokens.
+- **[r-skills](https://github.com/ab604/claude-code-r-skills)**: R style, tidyverse, rlang, package development, and testing.
+- **[Posit skills](https://github.com/posit-dev/skills)**: `r-lib` for cli, testthat, lifecycle, CRAN checks, and mirai. `quarto` for Quarto documents. `shiny` for Shiny apps with bslib.
+- **[python-skills](https://github.com/wdm0006/python-skills)**: `python-library-foundations` for project setup with uv, ruff, and pytest.
+- **[duckdb-skills](https://github.com/duckdb/duckdb-skills)**: reads, attaches, and queries data files.
+- **[UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)**: design systems, palettes, and UX rules for interfaces.
 
 ## Requirements
 
@@ -55,7 +69,7 @@ When the review passes, Claude opens a pull request that tells what changed and 
 
 ## Install
 
-### 1. My additions
+### 1. This repo
 
 Download the files into `~/.claude`. Edit them for your own languages and preferences.
 
@@ -100,7 +114,7 @@ ln -s ~/src/constitution/CONSTITUTION.md ~/.claude/rules/clanker-constitution.md
 
 To use it in one repository only, copy `CONSTITUTION.md` to the repository root and add `@CONSTITUTION.md` to that repository's `CLAUDE.md`. Pin a reviewed release tag, and update it through a pull request.
 
-### 3. Domain skills
+### 3. Skill plugins
 
 ```
 claude plugin marketplace add ab604/claude-code-r-skills
