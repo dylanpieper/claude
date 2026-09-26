@@ -118,8 +118,6 @@ for d in ~/src/accessibility-skills/skills/*/; do
 done
 ```
 
-These skills load into every session. Read the upstream diff before each `git pull`.
-
 ### 5. roborev
 
 ```
