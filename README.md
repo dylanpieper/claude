@@ -39,6 +39,7 @@ My rules override the installed tools when they conflict.
 
 - **[CLAUDE.md](CLAUDE.md)**: rules for every session: design, the shell, git, and the data stack.
 - **[rules/r.md](rules/r.md)**: my R preferences that the R plugins miss or contradict. It loads only when Claude reads an R file.
+- **[rules/roborev.md](rules/roborev.md)**: how Claude uses roborev when I ask in plain words to review or fix a branch or pull request. It points Claude to `roborev quickstart` for the live setup.
 - **[research-writing](skills/research-writing/SKILL.md)**: a skill with APA 7 and open-science rules for manuscripts, reports, and statistical results.
 - **[block_main_commit.py](hooks/block_main_commit.py)**: a hook that blocks `git commit` on `main`. When it cannot tell which branch a commit targets, it asks instead of allowing.
 - **[tests/](tests/)**: hook tests against real temporary repositories, and an end-to-end test that runs Claude Code with the hook. Run them with `uv run --no-project --with pytest pytest tests`. Add `CLAUDE_E2E=1` to include the end-to-end test, which calls the model.
@@ -79,6 +80,7 @@ base=https://raw.githubusercontent.com/dylanpieper/agentsflow/main
 mkdir -p ~/.claude/rules ~/.claude/skills/research-writing ~/.claude/hooks
 curl -fsSL $base/CLAUDE.md -o ~/.claude/CLAUDE.md
 curl -fsSL $base/rules/r.md -o ~/.claude/rules/r.md
+curl -fsSL $base/rules/roborev.md -o ~/.claude/rules/roborev.md
 curl -fsSL $base/skills/research-writing/SKILL.md -o ~/.claude/skills/research-writing/SKILL.md
 curl -fsSL $base/hooks/block_main_commit.py -o ~/.claude/hooks/block_main_commit.py
 ```
