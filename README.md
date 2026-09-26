@@ -54,7 +54,7 @@ curl -fsSL $base/rules/roborev.md -o ~/.claude/rules/roborev.md
 curl -fsSL $base/skills/research-writing/SKILL.md -o ~/.claude/skills/research-writing/SKILL.md
 ```
 
-Add to `~/.claude/settings.json`:
+Add this rule to `permissions.deny` in `~/.claude/settings.json`:
 
 ```
 {
