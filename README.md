@@ -39,6 +39,7 @@ My rules override the installed tools when they conflict.
 - **[python-skills](https://github.com/wdm0006/python-skills)**: Python setup with uv, ruff, and pytest.
 - **[duckdb-skills](https://github.com/duckdb/duckdb-skills)**: read and query data files.
 - **[UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)**: interface design guidance.
+- **[Superpowers](https://github.com/obra/superpowers)**: workflow skills for planning, test-driven development, and debugging.
 
 ## Requirements
 
@@ -104,6 +105,7 @@ claude plugin marketplace add duckdb/duckdb-skills
 claude plugin install duckdb-skills@duckdb-skills
 claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill
 claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill
+claude plugin install superpowers@claude-plugins-official
 ```
 
 ### 4. roborev
