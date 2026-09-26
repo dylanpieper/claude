@@ -40,12 +40,10 @@ My rules override the installed tools when they conflict.
 ### Data
 
 - **[duckdb-skills](https://github.com/duckdb/duckdb-skills)**: read and query data files.
-- **[data-dict](https://github.com/tidyverse/data-dict)**: data dictionaries that are checked against the data.
 
 ### R
 
 - **[r-skills](https://github.com/ab604/claude-code-r-skills)** and **[Posit skills](https://github.com/posit-dev/skills)**: R, packages, Quarto, and Shiny.
-- **[Air](https://posit-dev.github.io/air/)**: R code formatter.
 
 ### Python
 
@@ -146,15 +144,12 @@ claude plugin marketplace add EmilHvitfeldt/slidecrafting-book.com
 claude plugin install slidecrafting@slidecrafting
 ```
 
-### 6. data-dict
+### 6. Command-line tools the rules call
+
+`CLAUDE.md` calls [data-dict](https://github.com/tidyverse/data-dict). `rules/r.md` calls [Air](https://posit-dev.github.io/air/).
 
 ```
 uv tool install data-dict-yaml
-```
-
-### 7. Air
-
-```
 uv tool install air-formatter
 ```
 
